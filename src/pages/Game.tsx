@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CandyCane, ArrowLeft } from "lucide-react";
+import { CandyCane, ArrowLeft, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const Game = () => {
@@ -13,6 +13,11 @@ const Game = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   const { data: questions, isLoading, error } = useQuery({
     queryKey: ["questions"],
@@ -124,8 +129,18 @@ const Game = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>
-          <div className="text-lg font-semibold text-green-700">
-            Score: {score}
+          <div className="flex items-center gap-4">
+            <div className="text-lg font-semibold text-green-700">
+              Score: {score}
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </Button>
           </div>
         </div>
 
