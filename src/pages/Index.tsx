@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import Leaderboard from "@/components/Leaderboard";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -71,45 +72,31 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Leaderboard Card */}
+          {/* Stats Card */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <Trophy className="h-6 w-6 text-yellow-600" />
-                Leaderboard
+                Your Stats
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <p className="mb-4 text-gray-600">See the top holiday experts!</p>
-              <Button variant="outline" className="border-yellow-600 text-yellow-600 hover:bg-yellow-50">
-                View Scores
-              </Button>
+            <CardContent className="text-center space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-2xl font-bold text-green-600">{userInfo?.games_played || 0}</p>
+                  <p className="text-sm text-gray-600">Games Played</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-red-600">{userInfo?.total_score || 0}</p>
+                  <p className="text-sm text-gray-600">Total Score</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Game Stats */}
-        <Card className="bg-white/50 backdrop-blur">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-green-600">{userInfo?.games_played || 0}</p>
-                <p className="text-sm text-gray-600">Games Played</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-red-600">{userInfo?.total_score || 0}</p>
-                <p className="text-sm text-gray-600">Total Score</p>
-              </div>
-              <div className="col-span-2 md:col-span-1">
-                <p className="text-2xl font-bold text-blue-600">
-                  <Timer className="h-6 w-6 inline mr-2" />
-                  0:00
-                </p>
-                <p className="text-sm text-gray-600">Best Time</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Leaderboard Section */}
+        <Leaderboard />
       </div>
     </div>
   );
