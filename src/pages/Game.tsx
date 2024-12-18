@@ -59,18 +59,28 @@ const Game = () => {
       // Update the user's profile with the new score
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { error: updateError } = await supabase
+        // First get the current profile
+        const { data: profile } = await supabase
           .from('profiles')
-          .update({
-            total_score: supabase.sql`total_score + 1`
-          })
-          .eq('id', user.id);
+          .select('total_score')
+          .eq('id', user.id)
+          .single();
 
-        if (updateError) {
-          console.error('Error updating score:', updateError);
-        } else {
-          // Invalidate the userInfo query to trigger a refetch
-          queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+        if (profile) {
+          // Then update with the incremented score
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              total_score: (profile.total_score || 0) + 1
+            })
+            .eq('id', user.id);
+
+          if (updateError) {
+            console.error('Error updating score:', updateError);
+          } else {
+            // Invalidate the userInfo query to trigger a refetch
+            queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+          }
         }
       }
 
