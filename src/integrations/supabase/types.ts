@@ -9,7 +9,114 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      game_sessions: {
+        Row: {
+          ended_at: string | null
+          id: string
+          is_active: boolean | null
+          started_at: string
+        }
+        Insert: {
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          started_at?: string
+        }
+        Update: {
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          started_at?: string
+        }
+        Relationships: []
+      }
+      player_scores: {
+        Row: {
+          created_at: string
+          game_session_id: string
+          id: string
+          player_id: string
+          score: number | null
+        }
+        Insert: {
+          created_at?: string
+          game_session_id: string
+          id?: string
+          player_id: string
+          score?: number | null
+        }
+        Update: {
+          created_at?: string
+          game_session_id?: string
+          id?: string
+          player_id?: string
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_scores_game_session_id_fkey"
+            columns: ["game_session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_scores_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          games_played: number | null
+          id: string
+          total_score: number | null
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          games_played?: number | null
+          id: string
+          total_score?: number | null
+          username: string
+        }
+        Update: {
+          created_at?: string
+          games_played?: number | null
+          id?: string
+          total_score?: number | null
+          username?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          id: string
+          question: string
+          wrong_answers: string[]
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          id?: string
+          question: string
+          wrong_answers: string[]
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          id?: string
+          question?: string
+          wrong_answers?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
