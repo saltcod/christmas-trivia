@@ -13,9 +13,7 @@ import { Trophy } from "lucide-react";
 type LeaderboardPlayer = {
   id: string;
   total_score: number | null;
-  auth_user?: {
-    email: string;
-  } | null;
+  username: string;
 }
 
 const Leaderboard = () => {
@@ -27,7 +25,7 @@ const Leaderboard = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("*, auth_user:id(email)")
+        .select("id, username, total_score")
         .order("total_score", { ascending: false })
         .limit(10);
 
@@ -60,7 +58,7 @@ const Leaderboard = () => {
           {leaderboardData?.map((player, index) => (
             <TableRow key={player.id}>
               <TableCell className="font-medium">#{index + 1}</TableCell>
-              <TableCell>{player.auth_user?.email || 'Anonymous'}</TableCell>
+              <TableCell>{player.username}</TableCell>
               <TableCell className="text-right">{player.total_score || 0}</TableCell>
             </TableRow>
           ))}

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Play, Timer, UserRound } from "lucide-react";
+import { Trophy, Play, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,11 +16,20 @@ const Index = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return {
+          email: user.email,
+          total_score: 0,
+          games_played: 0
+        };
+      }
 
       return {
         email: user.email,
