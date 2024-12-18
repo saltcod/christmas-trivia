@@ -49,7 +49,7 @@ const Leaderboard = () => {
           {leaderboardData?.map((player, index) => (
             <TableRow key={player.id}>
               <TableCell className="font-medium">#{index + 1}</TableCell>
-              <TableCell>{player.email || "Anonymous Player"}</TableCell>
+              <TableCell>{player.username}</TableCell>
               <TableCell className="text-right">{player.total_score || 0}</TableCell>
             </TableRow>
           ))}
