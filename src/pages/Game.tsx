@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CandyCane, ArrowLeft, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 const Game = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -48,10 +49,31 @@ const Game = () => {
   console.log("Current question:", currentQuestion);
   console.log("Total questions available:", questions?.length);
 
-  const handleAnswerSelect = (answer: string) => {
+  const handleAnswerSelect = async (answer: string) => {
     setSelectedAnswer(answer);
-    if (answer === currentQuestion?.correct_answer) {
+    const isCorrect = answer === currentQuestion?.correct_answer;
+    
+    if (isCorrect) {
       setScore(score + 1);
+      
+      // Update the user's profile with the new score
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            total_score: supabase.sql`total_score + 1`
+          })
+          .eq('id', user.id);
+
+        if (updateError) {
+          console.error('Error updating score:', updateError);
+        } else {
+          // Invalidate the userInfo query to trigger a refetch
+          queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+        }
+      }
+
       toast({
         title: "Correct!",
         description: "Well done! 🎄",
@@ -149,7 +171,7 @@ const Game = () => {
             <CardContent className="p-6 space-y-6">
               <div className="text-center">
                 <p className="text-sm text-gray-500 mb-2">
-                  Question {currentQuestionIndex + 1} of {questions.length}
+                  Question {currentQuestionIndex + 1} of {questions?.length}
                 </p>
                 <h2 className="text-xl font-semibold text-gray-800">
                   {currentQuestion.question}
