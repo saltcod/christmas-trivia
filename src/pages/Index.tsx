@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Play, Timer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-100 to-green-100 p-8">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -24,7 +27,10 @@ const Index = () => {
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-4 text-gray-600">Ready to test your Christmas knowledge?</p>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button 
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => navigate('/game')}
+              >
                 Play Now
               </Button>
             </CardContent>
