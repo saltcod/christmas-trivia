@@ -10,6 +10,14 @@ import {
 } from "@/components/ui/table";
 import { Trophy } from "lucide-react";
 
+type LeaderboardPlayer = {
+  id: string;
+  total_score: number | null;
+  auth_user?: {
+    email: string;
+  } | null;
+}
+
 const Leaderboard = () => {
   const { data: leaderboardData, isLoading } = useQuery({
     queryKey: ["leaderboard"],
@@ -24,7 +32,7 @@ const Leaderboard = () => {
         .limit(10);
 
       if (error) throw error;
-      return data;
+      return data as LeaderboardPlayer[];
     },
   });
 
