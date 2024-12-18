@@ -9,8 +9,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 const Index = () => {
   const navigate = useNavigate();
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
+  const { data: userInfo } = useQuery({
+    queryKey: ["userInfo"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
@@ -21,7 +21,10 @@ const Index = () => {
         .eq("id", user.id)
         .single();
 
-      return profile;
+      return {
+        email: user.email,
+        ...profile
+      };
     },
   });
 
@@ -30,8 +33,8 @@ const Index = () => {
       {/* User Profile Section */}
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <div className="text-right">
-          <p className="text-sm font-medium text-gray-700">{profile?.username}</p>
-          <p className="text-xs text-gray-500">Total Score: {profile?.total_score || 0}</p>
+          <p className="text-sm font-medium text-gray-700">{userInfo?.email}</p>
+          <p className="text-xs text-gray-500">Total Score: {userInfo?.total_score || 0}</p>
         </div>
         <Avatar className="h-8 w-8">
           <AvatarFallback>
@@ -90,11 +93,11 @@ const Index = () => {
           <CardContent className="p-6">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-green-600">{profile?.games_played || 0}</p>
+                <p className="text-2xl font-bold text-green-600">{userInfo?.games_played || 0}</p>
                 <p className="text-sm text-gray-600">Games Played</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-red-600">{profile?.total_score || 0}</p>
+                <p className="text-2xl font-bold text-red-600">{userInfo?.total_score || 0}</p>
                 <p className="text-sm text-gray-600">Total Score</p>
               </div>
               <div className="col-span-2 md:col-span-1">
