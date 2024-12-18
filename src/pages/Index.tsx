@@ -1,13 +1,45 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Play, Timer } from "lucide-react";
+import { Trophy, Play, Timer, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Index = () => {
   const navigate = useNavigate();
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      return profile;
+    },
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-100 to-green-100 p-8">
+      {/* User Profile Section */}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <div className="text-right">
+          <p className="text-sm font-medium text-gray-700">{profile?.username}</p>
+          <p className="text-xs text-gray-500">Total Score: {profile?.total_score || 0}</p>
+        </div>
+        <Avatar className="h-8 w-8">
+          <AvatarFallback>
+            <UserRound className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+      </div>
+
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -58,11 +90,11 @@ const Index = () => {
           <CardContent className="p-6">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-green-600">0</p>
+                <p className="text-2xl font-bold text-green-600">{profile?.games_played || 0}</p>
                 <p className="text-sm text-gray-600">Games Played</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-red-600">0</p>
+                <p className="text-2xl font-bold text-red-600">{profile?.total_score || 0}</p>
                 <p className="text-sm text-gray-600">Total Score</p>
               </div>
               <div className="col-span-2 md:col-span-1">
