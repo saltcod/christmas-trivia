@@ -14,9 +14,18 @@ const Leaderboard = () => {
   const { data: leaderboardData, isLoading } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(`
+          id,
+          total_score,
+          users:id (
+            email
+          )
+        `)
         .order("total_score", { ascending: false })
         .limit(10);
 
@@ -49,7 +58,7 @@ const Leaderboard = () => {
           {leaderboardData?.map((player, index) => (
             <TableRow key={player.id}>
               <TableCell className="font-medium">#{index + 1}</TableCell>
-              <TableCell>{player.username}</TableCell>
+              <TableCell>{player.users?.email || 'Anonymous'}</TableCell>
               <TableCell className="text-right">{player.total_score || 0}</TableCell>
             </TableRow>
           ))}
