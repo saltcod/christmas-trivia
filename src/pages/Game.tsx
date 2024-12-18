@@ -17,23 +17,31 @@ const Game = () => {
   const { data: questions, isLoading, error } = useQuery({
     queryKey: ["questions"],
     queryFn: async () => {
-      console.log("Fetching questions...");
+      console.log("Starting to fetch questions...");
       const { data, error } = await supabase
         .from("questions")
         .select("*");
       
       if (error) {
-        console.error("Error fetching questions:", error);
+        console.error("Supabase error fetching questions:", error);
         throw error;
       }
       
-      console.log("Questions fetched:", data);
+      if (!data) {
+        console.log("No data returned from Supabase");
+        return [];
+      }
+      
+      console.log("Questions successfully fetched:", data);
+      console.log("Number of questions:", data.length);
       return data;
     },
   });
 
   const currentQuestion = questions?.[currentQuestionIndex];
+  console.log("Current question index:", currentQuestionIndex);
   console.log("Current question:", currentQuestion);
+  console.log("Total questions available:", questions?.length);
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
@@ -65,11 +73,12 @@ const Game = () => {
   };
 
   if (error) {
+    console.error("Error in component:", error);
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-100 to-green-100 p-8 flex items-center justify-center">
         <Card className="w-full max-w-2xl bg-white/90 backdrop-blur">
           <CardContent className="p-6">
-            <p className="text-red-600 text-center">Error loading questions. Please try again.</p>
+            <p className="text-red-600 text-center">Error loading questions: {error.message}</p>
             <Button onClick={() => navigate("/")} className="mt-4 w-full">
               Return Home
             </Button>
@@ -88,11 +97,12 @@ const Game = () => {
   }
 
   if (!questions || questions.length === 0) {
+    console.log("No questions available. questions array:", questions);
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-100 to-green-100 p-8 flex items-center justify-center">
         <Card className="w-full max-w-2xl bg-white/90 backdrop-blur">
           <CardContent className="p-6">
-            <p className="text-center">No questions available.</p>
+            <p className="text-center">No questions available. Please try again later.</p>
             <Button onClick={() => navigate("/")} className="mt-4 w-full">
               Return Home
             </Button>
